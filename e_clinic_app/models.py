@@ -43,7 +43,6 @@ class Person(models.Model):
 
 class Patient(Person):
     identification_type = models.IntegerField(choices=IDENTIFICATION, verbose_name="dowód tożsamości")
-    email = models.CharField(max_length=60, unique=True, verbose_name="E-mail")
     phone_number = models.IntegerField(unique=True, verbose_name="Telefon komórkowy")
 
 
@@ -82,11 +81,16 @@ class Term(models.Model):
         return f"{self.hour_from.strftime('%H:%M')}"
 
     def is_available(self):
-        return (
-                # not self.visit_set.all().exists()
-                self.date >= datetime.date.today()
-                and self.hour_from >= datetime.datetime.now().time()
-        )
+        if self.visit_set.all().exists():
+            return False
+
+        if self.date > datetime.date.today():
+            return True
+        elif self.date == datetime.date.today():
+            if self.hour_from >= datetime.datetime.now().time():
+                return True
+
+        return False
 
     def __str__(self):
         return f"{self.date}, {self.hour_from}, {self.hour_to}"

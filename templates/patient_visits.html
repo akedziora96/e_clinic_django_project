@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block body %}
+    <b>Twoje wizyty:</b>
+    <ul>
+    {% for visit in visit_list %}
+        <li>
+            {{ visit.date.date }} {{ visit.date.visit_hour }},
+            {{ visit.doctor.get_title_or_degree_display }}
+            {{ visit.doctor.name }}
+            <button><a href="{% url 'visit-details' visit.id %}">Szczegóły wizyty</a></button>
+            <button><a href="{% url 'visit-cancel' visit.id %}">odwołaj wizytę</a></button>
+        </li>
+    {% endfor %}
+    </ul>
+{% endblock %}

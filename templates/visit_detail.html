@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block body %}
+    <p><b>Dzień: {{ visit.date.date }}</b></p>
+    <p>Godzina: {{ visit.date.hour_from }}</p>
+    <p>Lekarz: {{ visit.doctor.get_title_or_degree_display }} {{ visit.doctor.name }}</p>
+    <p>Zabieg: {{ visit.procedure.name }}
+    <p>Cena wizyty: {{ visit.procedure.price }} zł</p>
+    <p>Gabinet: {{ visit.date.office }}</p>
+{% endblock %}

@@ -1,8 +1,14 @@
 {% extends 'base.html' %}
 {% block body %}
-    <h3>Poradnia {{ object.clinic }}</h3>
-    <table border="2">
 
+    <h3>Poradnia {{ object.clinic }}</h3>
+        <form method="get">
+            <button type="submit" name="week" value="-1">Previous week</button>
+            <button type="submit" name="week" value="1">Next week</button>
+        </form>
+    <p></p>
+
+    <table border="2">
     <th>Lekarz</th>
     {% for weekday, date in weekdays.items %}
         <th>

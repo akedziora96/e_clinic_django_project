@@ -16,6 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from e_clinic_app import views
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,4 +27,12 @@ urlpatterns = [
     path('procedure/<int:pk>/', views.ProcedureDetails.as_view(), name="procedure-detail"),
     path('doctor/<int:pk>/', views.DoctorDetails.as_view(), name="doctor-detail"),
     path('register_visit/<int:doc_id>/<str:date>/<str:hour>/', views.VisitAdd.as_view(), name="register_visit"),
+
+    path('login/', auth_views.LoginView.as_view(redirect_authenticated_user=True), name="login-page"),
+    path('logout/', auth_views.LogoutView.as_view(), name="logout-page"),
+    path('signup/', views.SignUpView.as_view(), name="signup"),
+
+    path('yourvisits/', views.PatientVisits.as_view(), name="patient-visits"),
+    path('visit/<int:pk>/', views.VisitDetails.as_view(), name="visit-details"),
+    path('visit/<int:pk>/cancel/', views.VisitCancel.as_view(), name="visit-cancel")
 ]

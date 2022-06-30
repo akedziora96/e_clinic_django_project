@@ -7,7 +7,13 @@
 <body>
     <h1>Twoja e-klinika</h1>
     <p>
-        <a href="#">Zaloguj się</a>
+        {% if user.is_authenticated %}
+        <b>{{ user.first_name }} {{ user.last_name }}</b>
+        <a href="{% url 'patient-visits' %}">Twoje wizyty</a>
+        <a href="{% url 'logout-page' %}">Wyloguj się</a>
+        {% else %}
+        <a href="{% url 'login-page' %}">Zaloguj się</a>
+        {% endif %}
         <a href="{% url 'main-page' %}">Strona główna</a>
         <a href="{% url 'specializations' %}">Specjalizacje</a>
         <a href="{% url 'procedures' %}">Oferta</a>

@@ -1,5 +1,8 @@
 {% extends 'base.html' %}
 {% block body %}
+    <p>pacjent: {{ patient.name }}</p>
+    <p>lekarz: {{ doctor.get_title_or_degree_display}} {{ doctor.name }}</p>
+    <p>data wizyty: {{ date.date}} {{ date.visit_hour }}</p>
     <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
