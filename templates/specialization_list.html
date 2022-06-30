@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block body %}
+    {% for specialization in object_list %}
+        <p><a href="{% url 'specialization-detail' specialization.id %}">{{ specialization }}</a></p>
+    {% endfor %}
+{% endblock %}

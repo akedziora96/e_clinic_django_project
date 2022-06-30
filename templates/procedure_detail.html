@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block body %}
+    <h>{{ object.name }}</h>
+    <table border="2">
+    <th>Zabieg</th><th>Koszt</th><th>Lekarze wykonujący</th>
+        <tr>
+            <td>{{ procedure.name }}</td>
+            <td>{{ procedure.price }}</td>
+            <td>
+                <ul>
+                {% for doc in procedure.doctor_set.all %}
+                    <li>{{ doc.get_title_or_degree_display }} {{ doc.name }}</li>
+                {% endfor %}
+                </ul>
+            </td>
+        </tr>
+    </table>
+{% endblock %}

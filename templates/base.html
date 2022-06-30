@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Base</title>
+</head>
+<body>
+    <h1>Twoja e-klinika</h1>
+    <p>
+        <a href="#">Zaloguj się</a>
+        <a href="{% url 'main-page' %}">Strona główna</a>
+        <a href="{% url 'specializations' %}">Specjalizacje</a>
+        <a href="{% url 'procedures' %}">Oferta</a>
+        <a href="#">Kontatk</a>
+    </p>
+    {% block body %}
+    {% endblock %}
+<footer>Aleksander Kędziora ©</footer>
+</body>
+</html>

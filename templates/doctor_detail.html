@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block body %}
+    <p><b>Imią i nazwisko: {{ doctor.name }}</b></p>
+    <p>Wykształcenie: {{ doctor.get_title_or_degree_display }}</p>
+    <p>
+        Specjalista z zakresu:
+        {% for specialization in doctor.specializations.all%}
+            {{ specialization.name }}
+        {% endfor %}
+    </p>
+    <p>PWZ: {{ doctor.pwz }}</p>
+{% endblock %}
