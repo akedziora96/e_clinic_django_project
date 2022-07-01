@@ -1,6 +1,6 @@
 import datetime
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AbstractUser
 from django.core.validators import MinValueValidator
 from django.db import models
 
@@ -57,6 +57,23 @@ class Specialization(models.Model):
         return self.name
 
 
+class Procedure(models.Model):
+    name = models.CharField(max_length=60, unique=True, verbose_name="Nazwa Zabiegu")
+    price = models.DecimalField(max_digits=6, decimal_places=2, verbose_name="Koszt zabiegu")
+
+    def __str__(self):
+        return f"{self.name} ({self.price} zł)"
+
+
+class Doctor(Person):
+    pwz = models.IntegerField(unique=True, verbose_name="PWZ")
+    specializations = models.ManyToManyField(Specialization, verbose_name="Specjalizacja")
+    title_or_degree = models.IntegerField(
+        choices=TITLES, verbose_name="Tytuł zawodowy, stopień naukowy bądź tytuł naukowy"
+    )
+    procedures = models.ManyToManyField(Procedure, verbose_name="Zabiegi wykonywane przez lekarza")
+
+
 class Office(models.Model):
     number = models.IntegerField(unique=True, validators=[MinValueValidator(0)], verbose_name="Nr gabinetu")
 
@@ -69,8 +86,9 @@ class Office(models.Model):
 
 class Term(models.Model):
     date = models.DateField(verbose_name="Dzień")
-    hour_from = models.TimeField(verbose_name="Od")
-    hour_to = models.TimeField(verbose_name="Do")
+    hour_from = models.TimeField(verbose_name="Od godziny")
+    hour_to = models.TimeField(verbose_name="Do godziny")
+    doctor = models.ForeignKey(Doctor, verbose_name="Lekarz", on_delete=models.CASCADE)
     office = models.ForeignKey(Office, on_delete=models.CASCADE, verbose_name="Gabinet")
 
     class Meta:
@@ -94,27 +112,6 @@ class Term(models.Model):
 
     def __str__(self):
         return f"{self.date}, {self.hour_from}, {self.hour_to}"
-
-
-class Procedure(models.Model):
-    name = models.CharField(max_length=60, unique=True, verbose_name="Nazwa Zabiegu")
-    price = models.DecimalField(max_digits=6, decimal_places=2, verbose_name="Koszt zabiegu")
-
-    def __str__(self):
-        return f"{self.name} ({self.price} zł)"
-
-
-class Doctor(Person):
-    pwz = models.IntegerField(unique=True, verbose_name="PWZ")
-    specializations = models.ManyToManyField(Specialization, verbose_name="Specjalizacja")
-    title_or_degree = models.IntegerField(
-        choices=TITLES, verbose_name="Tytuł zawodowy, stopień naukowy bądź tytuł naukowy"
-    )
-    terms = models.ManyToManyField(Term, verbose_name="Dostępność")
-    procedures = models.ManyToManyField(Procedure, verbose_name="Zabiegi wykonywane przez lekarza")
-
-    def is_free(self, date):
-        return self.terms.filter(date=date).exists() and not Visit.objects.filter(visit_date=date)
 
 
 class Visit(models.Model):

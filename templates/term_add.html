@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block body %}
+    <form method="post">
+        {% csrf_token%}
+        <p>{{ message }}</p>
+        {{ form.as_p }}
+        <button type="submit" name='add_option' value="add_one">Dodaj termin dla pacjenta</button>
+{#        <p></p>#}
+{#        Ustaw automatycznie wypełnianie dnia wizytami zgodnie z interwałem:#}
+{#        {{ form_expansion.as_p }}#}
+{#        <button type="submit" name='add_option' value="add_multiple">Automatyczne uzupełnienie</button>#}
+{#    </form>#}
+{% endblock %}

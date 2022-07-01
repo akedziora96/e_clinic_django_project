@@ -1,50 +1,55 @@
 {% extends 'base.html' %}
+{% load getatrr %}
 {% block body %}
 
-    <h3>Poradnia {{ object.clinic }}</h3>
-        <form method="get">
-            <button type="submit" name="week" value="-1">Previous week</button>
-            <button type="submit" name="week" value="1">Next week</button>
-        </form>
+    <h3>Poradnia {{ specialization.clinic }}</h3>
+    <form method="get">
+        <button {% if not is_offset %} disabled {% endif %} type="submit" name="week" value="previous">Previous week</button>
+        <button type="submit" name="week" value="next">Next week</button>
+    </form>
     <p></p>
 
     <table border="2">
-    <th>Lekarz</th>
-    {% for weekday, date in weekdays.items %}
-        <th>
-            <p><b>{{ weekday }}</b></p>
-            <p>{{ date }}</p>
-        </th>
-    {% endfor %}
+        <th>Lekarz</th>
+        {% for weekday, date in weekdays.items %}
+            <th>
+                <p><b>{{ weekday }}</b></p>
+                <p>{{ date }}</p>
+            </th>
+        {% endfor %}
 
-    {% for doctor, week_terms in doctor_week_terms.items %}
-        <tr>
-            <td><a href="{% url 'doctor-detail' doctor.id %}">
-                {{ doctor.get_title_or_degree_display }} {{ doctor.name }}
-            </a></td>
-            {% for day in week_terms %}
-                <td style="text-align:center">{% if day %}
-                    <ul style="list-style: none;">
-                    {% for term in day %}
-                        <li>
-                            <button>
-                                {% if term.is_available %}
-                                    {% url 'register_visit' doctor.id term.date term.hour_from  as register_url%}
-                                    <a href="{{ register_url }}">{{ term.visit_hour }}</a>
-                                {% else %}
-                                    <s>{{ term.visit_hour }}</s>
-                                {% endif %}
-                            </button>
-                        </li>
-                        <li>
-                            <p></p>
-                        </li>
-                    {% endfor%}
-                    </ul>
-                {% else %} - {% endif %}
-                </td>
-            {% endfor %}
-        </tr>
-    {% endfor %}
+        {% for doctor, week_terms in doctor_week_terms.items %}
+            <tr>
+                <td><a href="{% url 'doctor-detail' doctor.id %}">
+                    {{ doctor.get_title_or_degree_display }} {{ doctor.name }}
+                </a></td>
+                {% for day in week_terms %}
+                    <td style="text-align:center">{% if day %}
+                        <ul style="list-style: none;">
+                            {% for term in day %}
+                                <li>
+                                    <button {% if not term.is_available %} disabled {% endif %}>
+                                        {% if term.is_available %}
+                                            {% if not user|get_attr:'doctor' %}
+                                                {% url 'register_visit' doctor.id term.date term.hour_from  as register_url%}
+                                                <a href="{{ register_url }}">{{ term.visit_hour }}</a>
+                                            {% else %}
+                                                {{ term.visit_hour }}
+                                            {% endif %}
+                                        {% else %}
+                                            <s>{{ term.visit_hour }}</s>
+                                        {% endif %}
+                                    </button>
+                                </li>
+                                <li>
+                                    <p></p>
+                                </li>
+                            {% endfor%}
+                        </ul>
+                    {% else %} - {% endif %}
+                    </td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
     </table>
 {% endblock %}

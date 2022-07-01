@@ -32,7 +32,9 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(), name="logout-page"),
     path('signup/', views.SignUpView.as_view(), name="signup"),
 
-    path('yourvisits/', views.PatientVisits.as_view(), name="patient-visits"),
+    path('yourvisits/', views.UserVisits.as_view(), name="user-visits"),
     path('visit/<int:pk>/', views.VisitDetails.as_view(), name="visit-details"),
-    path('visit/<int:pk>/cancel/', views.VisitCancel.as_view(), name="visit-cancel")
+    path('visit/<int:pk>/cancel/', views.VisitCancel.as_view(), name="visit-cancel"),
+
+    path('add_term/', views.TermAdd.as_view(), name="add-term")
 ]

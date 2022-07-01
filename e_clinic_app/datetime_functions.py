@@ -1,18 +1,33 @@
 from datetime import datetime, timedelta
 
+WEEKDAYS = {
+    1: "Poniedziałek",
+    2: "Wtorek",
+    3: "Środa",
+    4: "Czwartek",
+    5: "Piątek",
+    6: "Sobota"
+}
 
-def get_monday(offset=0):
+
+def get_weekdays_names(dates):
+    return {WEEKDAYS[date.weekday() + 1]: date.strftime("%d.%m") for date in dates}
+
+
+def get_week_start_and_end(week_offset=0):
+    day_offset = 7 * week_offset
     now = datetime.now()
-    now += timedelta(days=offset)
-    monday = now - timedelta(days=now.weekday())
-    return monday
+    offset_now = now + timedelta(days=day_offset)
+    offset_monday = offset_now - timedelta(days=offset_now.weekday())
+    offset_saturday = offset_monday + timedelta(days=5)
 
+    if offset_saturday < datetime.today():
+        current_week_monday = now - timedelta(days=now.weekday())
+        current_week_saturday = current_week_monday + timedelta(days=5)
+        return current_week_monday, current_week_saturday
 
-def get_saturday(offset=0):
-    monday = get_monday(offset)
-    friday = monday + timedelta(days=5)
-    return friday
+    return offset_monday, offset_saturday
 
 
 if __name__ == '__main__':
-    print(get_monday(7), get_saturday(7))
+    print(get_week_start_and_end(1))

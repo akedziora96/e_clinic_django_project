@@ -9,7 +9,7 @@
     <p>
         {% if user.is_authenticated %}
         <b>{{ user.first_name }} {{ user.last_name }}</b>
-        <a href="{% url 'patient-visits' %}">Twoje wizyty</a>
+        <a href="{% url 'user-visits' %}">Twoje wizyty</a>
         <a href="{% url 'logout-page' %}">Wyloguj się</a>
         {% else %}
         <a href="{% url 'login-page' %}">Zaloguj się</a>
@@ -17,7 +17,7 @@
         <a href="{% url 'main-page' %}">Strona główna</a>
         <a href="{% url 'specializations' %}">Specjalizacje</a>
         <a href="{% url 'procedures' %}">Oferta</a>
-        <a href="#">Kontatk</a>
+        <a href="#">Kontakt</a>
     </p>
     {% block body %}
     {% endblock %}
