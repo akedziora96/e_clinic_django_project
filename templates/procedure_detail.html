@@ -1,15 +1,19 @@
 {% extends 'base.html' %}
 {% block body %}
-    <h>{{ object.name }}</h>
+    <h>{{ procedure.name }}</h>
     <table border="2">
-    <th>Zabieg</th><th>Koszt</th><th>Lekarze wykonujący</th>
+    <th>Treatment</th><th>Price</th><th>Doctors Performing</th>
         <tr>
             <td>{{ procedure.name }}</td>
             <td>{{ procedure.price }}</td>
             <td>
                 <ul>
                 {% for doc in procedure.doctor_set.all %}
-                    <li>{{ doc.get_title_or_degree_display }} {{ doc.name }}</li>
+                    <li>
+                    <a href="{% url 'specialization-detail' doc.specializations.all.first.id  %}">
+                        {{ doc.get_title_or_degree_display }} {{ doc.name }}
+                    </a>
+                    </li>
                 {% endfor %}
                 </ul>
             </td>

@@ -1,12 +1,12 @@
 from datetime import datetime, timedelta
 
 WEEKDAYS = {
-    1: "Poniedziałek",
-    2: "Wtorek",
-    3: "Środa",
-    4: "Czwartek",
-    5: "Piątek",
-    6: "Sobota"
+    1: "Monday",
+    2: "Tuesday",
+    3: "Wednesday",
+    4: "Thursday",
+    5: "Friday",
+    6: "Saturday"
 }
 
 

@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 {% block body %}
-    <p>pacjent: {{ patient.name }}</p>
-    <p>lekarz: {{ doctor.get_title_or_degree_display}} {{ doctor.name }}</p>
-    <p>data wizyty: {{ date.date}} {{ date.visit_hour }}</p>
+    <p>Patient's name: {{ patient.name }}</p>
+    <p>Doctor's name: {{ doctor.get_title_or_degree_display}} {{ doctor.name }}</p>
+    <p>Visit date: {{ date.date}} {{ date.visit_hour }}</p>
     <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Umów się na wizytę!">
-    <p></p>
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Make an Appointment</button>
+        <p></p>
     </form>
 {% endblock %}

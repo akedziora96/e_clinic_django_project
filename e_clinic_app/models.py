@@ -5,9 +5,8 @@ from django.core.validators import MinValueValidator
 from django.db import models
 
 IDENTIFICATION = [
-    (1, "Dowód tożsamości"),
-    (2, "Paszport"),
-    (3, "Akt urodzenia*")
+    (1, "ID card"),
+    (2, "Passport"),
 ]
 
 TITLES = [
@@ -21,7 +20,7 @@ TITLES = [
 
 class Person(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    pesel = models.IntegerField(unique=True, verbose_name="PESEL")
+    pesel = models.IntegerField(unique=True, verbose_name="PESEL (polish ID number)")
 
     class Meta:
         abstract = True
@@ -42,12 +41,12 @@ class Person(models.Model):
 
 
 class Patient(Person):
-    identification_type = models.IntegerField(choices=IDENTIFICATION, verbose_name="dowód tożsamości")
-    phone_number = models.IntegerField(unique=True, verbose_name="Telefon komórkowy")
+    identification_type = models.IntegerField(choices=IDENTIFICATION, verbose_name="identification type")
+    phone_number = models.IntegerField(unique=True, verbose_name="phone number")
 
 
 class Specialization(models.Model):
-    name = models.CharField(max_length=100, unique=True, verbose_name="Specjalizacja")
+    name = models.CharField(max_length=100, unique=True, verbose_name="specialization name")
 
     @property
     def clinic(self):
@@ -58,24 +57,24 @@ class Specialization(models.Model):
 
 
 class Procedure(models.Model):
-    name = models.CharField(max_length=60, unique=True, verbose_name="Nazwa Zabiegu")
-    price = models.DecimalField(max_digits=6, decimal_places=2, verbose_name="Koszt zabiegu")
+    name = models.CharField(max_length=60, unique=True, verbose_name="treatment name")
+    price = models.DecimalField(max_digits=6, decimal_places=2, verbose_name="treatment price")
 
     def __str__(self):
         return f"{self.name} ({self.price} zł)"
 
 
 class Doctor(Person):
-    pwz = models.IntegerField(unique=True, verbose_name="PWZ")
-    specializations = models.ManyToManyField(Specialization, verbose_name="Specjalizacja")
+    pwz = models.IntegerField(unique=True, verbose_name="PWZ (doctor's license")
+    specializations = models.ManyToManyField(Specialization, verbose_name="Specialization")
     title_or_degree = models.IntegerField(
-        choices=TITLES, verbose_name="Tytuł zawodowy, stopień naukowy bądź tytuł naukowy"
+        choices=TITLES, verbose_name="Scientific degree"
     )
-    procedures = models.ManyToManyField(Procedure, verbose_name="Zabiegi wykonywane przez lekarza")
+    procedures = models.ManyToManyField(Procedure, verbose_name="Treatments performed by doctor")
 
 
 class Office(models.Model):
-    number = models.IntegerField(unique=True, validators=[MinValueValidator(0)], verbose_name="Nr gabinetu")
+    number = models.IntegerField(unique=True, validators=[MinValueValidator(0)], verbose_name="Office Number")
 
     def is_free(self, date):
         return not Term.objects.filter(office=self, date=date).exists()
@@ -85,11 +84,11 @@ class Office(models.Model):
 
 
 class Term(models.Model):
-    date = models.DateField(verbose_name="Dzień")
-    hour_from = models.TimeField(verbose_name="Od godziny")
-    hour_to = models.TimeField(verbose_name="Do godziny")
-    doctor = models.ForeignKey(Doctor, verbose_name="Lekarz", on_delete=models.CASCADE)
-    office = models.ForeignKey(Office, on_delete=models.CASCADE, verbose_name="Gabinet")
+    date = models.DateField(verbose_name="Day's date")
+    hour_from = models.TimeField(verbose_name="From hour")
+    hour_to = models.TimeField(verbose_name="To hour")
+    doctor = models.ForeignKey(Doctor, verbose_name="Doctor", on_delete=models.CASCADE)
+    office = models.ForeignKey(Office, on_delete=models.CASCADE, verbose_name="Office")
 
     class Meta:
         unique_together = ['date', 'hour_from', 'hour_to', 'office']
@@ -115,10 +114,10 @@ class Term(models.Model):
 
 
 class Visit(models.Model):
-    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, verbose_name="Pacjent")
-    doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE, verbose_name="Lekarz")
-    date = models.ForeignKey(Term, on_delete=models.CASCADE, verbose_name="Termin wizyty")
-    procedure = models.ForeignKey(Procedure, on_delete=models.CASCADE, verbose_name="Wybrany zabieg")
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, verbose_name="Patient")
+    doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE, verbose_name="Doctor")
+    date = models.ForeignKey(Term, on_delete=models.CASCADE, verbose_name="Visit term")
+    procedure = models.ForeignKey(Procedure, on_delete=models.CASCADE, verbose_name="Chosen treatment")
 
     def __str__(self):
         return f"{self.date} {self.patient} u {self.doctor.get_title_or_degree_display()} {self.doctor}"

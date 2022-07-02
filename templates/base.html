@@ -1,3 +1,4 @@
+{% load getatrr %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,22 +6,24 @@
     <title>Base</title>
 </head>
 <body>
-    <h1>Twoja e-klinika</h1>
-    <p>
-        {% if user.is_authenticated %}
+<h1><a href="{% url 'main-page' %}">Your e-clinic</a></h1>
+<p>
+    {% if user.is_authenticated %}
         <b>{{ user.first_name }} {{ user.last_name }}</b>
-        <a href="{% url 'user-visits' %}">Twoje wizyty</a>
-        <a href="{% url 'logout-page' %}">Wyloguj się</a>
-        {% else %}
-        <a href="{% url 'login-page' %}">Zaloguj się</a>
+        {% if user|get_attr:'doctor' %}
+            <a href="{% url 'add-term' %}">Add terms</a>
         {% endif %}
-        <a href="{% url 'main-page' %}">Strona główna</a>
-        <a href="{% url 'specializations' %}">Specjalizacje</a>
-        <a href="{% url 'procedures' %}">Oferta</a>
-        <a href="#">Kontakt</a>
-    </p>
-    {% block body %}
-    {% endblock %}
+        <a href="{% url 'user-visits' %}">Your Visits</a>
+        <a href="{% url 'logout-page' %}">Logout</a>
+    {% else %}
+        <a href="{% url 'login-page' %}">Login</a>
+    {% endif %}
+    <a href="{% url 'specializations' %}">MAKE AN APPOINTMENT</a>
+    <a href="{% url 'procedures' %}">Treatments Offer</a>
+    <a href="#">Contact Us</a>
+</p>
+{% block body %}
+{% endblock %}
 <footer>Aleksander Kędziora ©</footer>
 </body>
 </html>

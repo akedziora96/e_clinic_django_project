@@ -36,5 +36,6 @@ urlpatterns = [
     path('visit/<int:pk>/', views.VisitDetails.as_view(), name="visit-details"),
     path('visit/<int:pk>/cancel/', views.VisitCancel.as_view(), name="visit-cancel"),
 
-    path('add_term/', views.TermAdd.as_view(), name="add-term")
+    path('add_term/', views.TermAdd.as_view(), name="add-term"),
+    path('cancel_term/<int:pk>/', views.TermCancel.as_view(), name="cancel-term")
 ]

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load getatrr %}
 {% block body %}
-    <b>Twoje wizyty:</b>
+    <b>Your Visits:</b>
     <ul>
     {% for visit in visit_list %}
         <li>
@@ -12,8 +12,8 @@
             {% else %}
             {{ visit.patient.name }}
             {% endif %}
-            <button><a href="{% url 'visit-details' visit.id %}">Szczegóły wizyty</a></button>
-            <button><a href="{% url 'visit-cancel' visit.id %}">odwołaj wizytę</a></button>
+            <button><a href="{% url 'visit-details' visit.id %}">Visit Details</a></button>
+            <button><a href="{% url 'visit-cancel' visit.id %}">Cancel Visit</a></button>
         </li>
     {% endfor %}
     </ul>

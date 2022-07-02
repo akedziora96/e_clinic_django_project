@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
 {% load getatrr %}
 {% block body %}
-    <p><b>Dzień: {{ visit.date.date }}</b></p>
-    <p>Godzina: {{ visit.date.hour_from }}</p>
+    <p><b>Day: {{ visit.date.date }}</b></p>
+    <p>Hour: {{ visit.date.hour_from }}</p>
     {% if user|get_attr:'patient' %}
-        <p>Lekarz: {{ visit.doctor.get_title_or_degree_display }} {{ visit.doctor.name }}</p>
+        <p>Doctor's name: {{ visit.doctor.get_title_or_degree_display }} {{ visit.doctor.name }}</p>
     {% else %}
-        <p>Pacjent: {{ visit.patient.name}}</p>
+        <p>Patient's name: {{ visit.patient.name}}</p>
     {% endif %}
-    <p>Zabieg: {{ visit.procedure.name }}
-    <p>Cena wizyty: {{ visit.procedure.price }} zł</p>
-    <p>Gabinet: {{ visit.date.office }}</p>
+    <p>Treatment: {{ visit.procedure.name }}
+    <p>Price: {{ visit.procedure.price }} zł</p>
+    <p>Office: {{ visit.date.office }}</p>
 {% endblock %}

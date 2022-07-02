@@ -2,7 +2,7 @@
 {% load getatrr %}
 {% block body %}
 
-    <h3>Poradnia {{ specialization.clinic }}</h3>
+    <h3>Clinic of {{ specialization.name }}</h3>
     <form method="get">
         <button {% if not is_offset %} disabled {% endif %} type="submit" name="week" value="previous">Previous week</button>
         <button type="submit" name="week" value="next">Next week</button>
@@ -10,7 +10,7 @@
     <p></p>
 
     <table border="2">
-        <th>Lekarz</th>
+        <th>Doctor</th>
         {% for weekday, date in weekdays.items %}
             <th>
                 <p><b>{{ weekday }}</b></p>
@@ -20,7 +20,7 @@
 
         {% for doctor, week_terms in doctor_week_terms.items %}
             <tr>
-                <td><a href="{% url 'doctor-detail' doctor.id %}">
+                <td><a id="{{ doctor.id }}" href="{% url 'doctor-detail' doctor.id %}">
                     {{ doctor.get_title_or_degree_display }} {{ doctor.name }}
                 </a></td>
                 {% for day in week_terms %}
@@ -34,7 +34,11 @@
                                                 {% url 'register_visit' doctor.id term.date term.hour_from  as register_url%}
                                                 <a href="{{ register_url }}">{{ term.visit_hour }}</a>
                                             {% else %}
-                                                {{ term.visit_hour }}
+                                                {% if term.doctor == user.doctor %}
+                                                    <a href=" {% url 'cancel-term' term.id %}">{{ term.visit_hour }}</a>
+                                                {% else %}
+                                                    {{ term.visit_hour }}
+                                                {% endif %}
                                             {% endif %}
                                         {% else %}
                                             <s>{{ term.visit_hour }}</s>
