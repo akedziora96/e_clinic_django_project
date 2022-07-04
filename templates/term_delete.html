@@ -1,4 +1,9 @@
+{% extends 'base.html' %}
+{% block body %}
 <form method="post">
     {% csrf_token %}
+    <h3>Do you want to cancel Term ? on {{ term.date }} {{ term.visit_hour }} in office no. {{ term.office }}?</h3>
     <button type="submit">Delete</button>
+    <button><a href="{% url 'specialization-detail' term.doctor.specializations.all.first.id  %}">Cancel</a></button>
 </form>
+{% endblock %}

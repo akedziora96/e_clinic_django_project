@@ -9,7 +9,7 @@ class Test:
 
 @register.filter
 def get_attr(obj, val):
-    return getattr(obj, val, None)
+    return getattr(obj, val, False)
 
 
 if __name__ == "__main__":

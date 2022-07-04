@@ -13,6 +13,9 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf.urls.static import static
+from django.conf import settings
+
 from django.contrib import admin
 from django.urls import path
 from e_clinic_app import views
@@ -38,4 +41,5 @@ urlpatterns = [
 
     path('add_term/', views.TermAdd.as_view(), name="add-term"),
     path('cancel_term/<int:pk>/', views.TermCancel.as_view(), name="cancel-term")
-]
+
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

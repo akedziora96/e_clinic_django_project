@@ -4,10 +4,10 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.core.validators import RegexValidator
 
 from localflavor.pl.forms import PLPESELField
-from e_clinic_app.models import Visit, Patient, Term, Doctor
+from e_clinic_app.models import Visit, Patient, Term
+from e_clinic_app.validators import phone_regex_validator, person_name_validator
 
 
 class AddVisitForm(forms.ModelForm):
@@ -25,34 +25,16 @@ class RegisterFormUser(UserCreationForm):
 
     def clean_first_name(self):
         first_name = self.cleaned_data.get('first_name')
-        if len(first_name.strip()) == 0:
-            raise ValidationError("Pole 'imię' nie może być puste!")
-        for char in first_name:
-            if not char.isalpha():
-                raise ValidationError("Imię powinno składać się wyłącznie z liter alfabetu łacińskiego!")
-            if char.isspace():
-                raise ValidationError("Imię nie może zawierać białych znaków!")
-        return first_name
+        return person_name_validator(first_name)
 
     def clean_last_name(self):
         last_name = self.cleaned_data.get('last_name')
-        if len(last_name.strip()) == 0:
-            raise ValidationError("Pole 'nazwisko' nie może być puste!")
-        for char in last_name:
-            if not char.isalpha():
-                raise ValidationError("Imię powinno składać się wyłącznie z liter alfabetu łacińskiego!")
-            if char.isspace():
-                raise ValidationError("Imię nie może zawierać białych znaków!")
-        return last_name
+        return person_name_validator(last_name)
 
 
 class RegisterFormPatient(forms.ModelForm):
     pesel = PLPESELField(required=True)
-    phone_regex = RegexValidator(
-        regex=r'^\+?1?\d{9,15}$',
-        message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed."
-    )
-    phone_number = forms.CharField(validators=[phone_regex], max_length=17, required=True)
+    phone_number = forms.CharField(validators=[phone_regex_validator], max_length=17, required=True)
 
     class Meta:
         model = Patient
@@ -86,7 +68,7 @@ class TermAddForm(forms.ModelForm):
         pt2 |= pt.filter(doctor=self.user.doctor)
 
         if pt2.exists():
-            raise ValidationError(f"Gabinet zajęty")
+            raise ValidationError(f"Office is already occupied!")
 
     class Meta:
         model = Term
@@ -98,5 +80,3 @@ class TermAddForm(forms.ModelForm):
             'hour_to': forms.TimeInput(format='%H:%M')
         }
 
-# class TermAddFormExpansion(forms.Form):
-#     visit_time = forms.ChoiceField(choices=MINUTES, label="ustaw automatycznie czas wizyty", initial=30)

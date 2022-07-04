@@ -2,15 +2,15 @@ import datetime
 
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
-from django.http import HttpResponse, Http404
+from django.http import Http404
 from django.urls import reverse_lazy
 
 from . import forms
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views import View
-from django.views.generic import ListView, DetailView, CreateView, DeleteView
-from e_clinic_app.models import Specialization, Doctor, Procedure, Visit, Patient, Term
-from .datetime_functions import get_week_start_and_end, get_weekdays_names
+from django.views.generic import ListView, DetailView, DeleteView
+from .models import Specialization, Doctor, Procedure, Visit, Patient, Term
+from .functions.datetime_functions import get_week_start_and_end, get_weekdays_names
 from .forms import RegisterFormUser, RegisterFormPatient, TermAddForm
 
 
@@ -36,18 +36,11 @@ class SpecializationDetails(DetailView):
         context = super().get_context_data(**kwargs)
         spec_doctors = self.object.doctor_set.all().order_by('user__last_name').order_by('user__first_name')
 
-        week_offset = self.request.GET.get('week')
-        week_offset_session = self.request.session.get('week_offset')
-        if week_offset is not None and week_offset_session is not None:
-            if week_offset == 'next':
-                self.request.session['week_offset'] += 1
-            if week_offset == 'previous' and week_offset_session > 0:
-                self.request.session['week_offset'] -= 1
-        else:
-            self.request.session['week_offset'] = 0
+        week_offset = 0 if self.request.GET.get('week') is None else int(self.request.GET.get('week'))
+        context['offset'] = 0 if week_offset <= 0 else week_offset
+        context['is_offset'] = context.get('offset') > 0
 
-        dates_in_offset_week = self.generate_terms(self.request.session['week_offset'])
-
+        dates_in_offset_week = self.generate_terms(context.get('offset'))
         week_terms = {}
         for spec_doctor in spec_doctors:
             temp = []
@@ -57,7 +50,6 @@ class SpecializationDetails(DetailView):
 
         context['doctor_week_terms'] = week_terms
         context['weekdays'] = get_weekdays_names(dates_in_offset_week)
-        context['is_offset'] = self.request.session.get('week_offset') > 0
 
         return context
 
@@ -70,12 +62,6 @@ class ProcedureList(ListView):
 class ProcedureDetails(DetailView):
     model = Procedure
     template_name = 'procedure_detail.html'
-
-    # def get_context_data(self, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-    #     procedure_doctors = self.object.doctor_set.all()
-    #     for doctor in procedure_doctors:
-    #         print(doctor.specializations.all())
 
 
 class DoctorDetails(DetailView):
@@ -223,7 +209,7 @@ class TermAdd(UserPassesTestMixin, View):
             office = data.get('office')
 
             Term.objects.create(date=date, hour_from=hour_from, hour_to=hour_to, office=office, doctor=doctor)
-            return redirect('main-page')
+            return redirect('specialization-detail', pk=doctor.specializations.all().first().id)
 
         return render(request, 'term_add.html', {'form': form})
 
@@ -231,9 +217,11 @@ class TermAdd(UserPassesTestMixin, View):
 class TermCancel(UserPassesTestMixin, DeleteView):
     model = Term
     template_name = 'term_delete.html'
-    success_url = reverse_lazy('main-page')
     login_url = reverse_lazy('login-page')
 
     def test_func(self):
         user = self.request.user
         return getattr(user, 'doctor', False)
+
+    def get_success_url(self):
+        return reverse_lazy('specialization-detail', kwargs={'pk': self.object.doctor.specializations.all().first().id})

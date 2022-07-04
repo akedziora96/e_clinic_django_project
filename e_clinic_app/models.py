@@ -1,7 +1,7 @@
 import datetime
 
 from django.contrib.auth.models import User, AbstractUser
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
 IDENTIFICATION = [
@@ -32,25 +32,21 @@ class Person(models.Model):
     def name(self):
         return f"{self.user.first_name} {self.user.last_name}"
 
-    @property
-    def date_of_birth(self):
-        pesel = str(self.pesel)
-        time_data = f"{pesel[2:4]}-{pesel[4:6]}-{pesel[0:2]}"
-        format_data = "%d-%m-%y"
-        return datetime.datetime.strptime(time_data, format_data)
+    # @property
+    # def date_of_birth(self):
+    #     pesel = str(self.pesel)
+    #     time_data = f"{pesel[2:4]}-{pesel[4:6]}-{pesel[0:2]}"
+    #     format_data = "%d-%m-%y"
+    #     return datetime.datetime.strptime(time_data, format_data)
 
 
 class Patient(Person):
     identification_type = models.IntegerField(choices=IDENTIFICATION, verbose_name="identification type")
-    phone_number = models.IntegerField(unique=True, verbose_name="phone number")
+    phone_number = models.CharField(max_length=11, unique=True, verbose_name="phone number")
 
 
 class Specialization(models.Model):
     name = models.CharField(max_length=100, unique=True, verbose_name="specialization name")
-
-    @property
-    def clinic(self):
-        return f"{self.name[:-1]}czna"
 
     def __str__(self):
         return self.name
@@ -61,7 +57,7 @@ class Procedure(models.Model):
     price = models.DecimalField(max_digits=6, decimal_places=2, verbose_name="treatment price")
 
     def __str__(self):
-        return f"{self.name} ({self.price} zł)"
+        return f"{self.name} ({self.price} PLN)"
 
 
 class Doctor(Person):
@@ -98,19 +94,21 @@ class Term(models.Model):
         return f"{self.hour_from.strftime('%H:%M')}"
 
     def is_available(self):
-        if self.visit_set.all().exists():
+        if self.visit_set.exists():
             return False
 
         if self.date > datetime.date.today():
             return True
-        elif self.date == datetime.date.today():
-            if self.hour_from >= datetime.datetime.now().time():
-                return True
-
-        return False
+        elif self.date == datetime.date.today() and self.hour_from >= datetime.datetime.now().time():
+            return True
+        else:
+            return False
 
     def __str__(self):
         return f"{self.date}, {self.hour_from}, {self.hour_to}"
+
+    def find_visit(self):
+        return self.visit_set.all().first().id
 
 
 class Visit(models.Model):

@@ -11,7 +11,7 @@ WEEKDAYS = {
 
 
 def get_weekdays_names(dates):
-    return {WEEKDAYS[date.weekday() + 1]: date.strftime("%d.%m") for date in dates}
+    return {WEEKDAYS[date.weekday() + 1]: date.strftime("%d/%m") for date in dates}
 
 
 def get_week_start_and_end(week_offset=0):

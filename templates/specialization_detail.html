@@ -1,20 +1,27 @@
 {% extends 'base.html' %}
 {% load getatrr %}
 {% block body %}
+    <div class="container-fluid">
 
-    <h3>Clinic of {{ specialization.name }}</h3>
-    <form method="get">
-        <button {% if not is_offset %} disabled {% endif %} type="submit" name="week" value="previous">Previous week</button>
-        <button type="submit" name="week" value="next">Next week</button>
-    </form>
-    <p></p>
+        <div class="d-flex justify-content-between" >
+        <div class="align-self-end">
+            <h3>Clinic of {{ specialization.name }}</h3>
+        </div>
+            <div class="d-flex align-items-end">
+                <form method="get">
+                    <button class="btn btn-primary btn-sm" {% if not is_offset %} disabled {% endif %} type="submit" name="week" value="{{ offset|add:-1 }}">Previous week</button>
+                    <button class="btn btn-primary btn-sm" type="submit" name="week" value="{{ offset|add:1 }}">Next week</button>
+                </form>
+            </div>
+        </div>
+        <p></p>
 
-    <table border="2">
-        <th>Doctor</th>
+    <div class="d-flex align-items-center justify-content-center w-50 p-3 middle use my-auto" style="background-color: #eee;">
+    <table class="table table-sm" >
+        <th style="text-align:center">Doctor</th>
         {% for weekday, date in weekdays.items %}
-            <th>
-                <p><b>{{ weekday }}</b></p>
-                <p>{{ date }}</p>
+            <th style="text-align:center">
+                <p><b>{{ weekday }} {{ date }}</b></p>
             </th>
         {% endfor %}
 
@@ -24,36 +31,76 @@
                     {{ doctor.get_title_or_degree_display }} {{ doctor.name }}
                 </a></td>
                 {% for day in week_terms %}
-                    <td style="text-align:center">{% if day %}
-                        <ul style="list-style: none;">
+                    <td style="text-align:center">
+                        {% if day %}
+                        <ul class="list-group" style="list-style: none;" >
                             {% for term in day %}
-                                <li>
-                                    <button {% if not term.is_available %} disabled {% endif %}>
-                                        {% if term.is_available %}
+
+                                <li class ="list-group-item">
+                                <div>
+                                    {% if term.is_available %}
                                             {% if not user|get_attr:'doctor' %}
                                                 {% url 'register_visit' doctor.id term.date term.hour_from  as register_url%}
-                                                <a href="{{ register_url }}">{{ term.visit_hour }}</a>
+                                                <a class="button" href="{{ register_url }}">{{ term.visit_hour }}</a>
                                             {% else %}
-                                                {% if term.doctor == user.doctor %}
-                                                    <a href=" {% url 'cancel-term' term.id %}">{{ term.visit_hour }}</a>
-                                                {% else %}
-                                                    {{ term.visit_hour }}
-                                                {% endif %}
+                                                {{ term.visit_hour }}
                                             {% endif %}
-                                        {% else %}
-                                            <s>{{ term.visit_hour }}</s>
+                                        {% if term.doctor == user.doctor %}
+                                                <a class="button" href=" {% url 'cancel-term' term.id %}">Cancel Term</a>
                                         {% endif %}
-                                    </button>
+                                    {% else %}
+                                        {{ term.visit_hour }}
+                                        {% if  user|get_attr:'doctor'  and term.doctor == user.doctor and term.visit_set.all.exists %}
+                                            <a class="button" href="{% url 'visit-details' term.find_visit %}">Visit Details</a>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
                                 </li>
                                 <li>
                                     <p></p>
                                 </li>
                             {% endfor%}
                         </ul>
-                    {% else %} - {% endif %}
+                    {% else %}
+                            -
+                        {% endif %}
                     </td>
                 {% endfor %}
             </tr>
         {% endfor %}
     </table>
+    </div>
+    </div>
 {% endblock %}
+
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">First</th>
+      <th scope="col">Last</th>
+      <th scope="col">Handle</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">1</th>
+      <td>Mark</td>
+      <td>Otto</td>
+      <td>@mdo</td>
+    </tr>
+    <tr>
+      <th scope="row">2</th>
+      <td>Jacob</td>
+      <td>Thornton</td>
+      <td>@fat</td>
+    </tr>
+    <tr>
+      <th scope="row">3</th>
+      <td>Larry</td>
+      <td>the Bird</td>
+      <td>@twitter</td>
+    </tr>
+  </tbody>
+</table>
