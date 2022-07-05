@@ -1,14 +1,21 @@
 {% extends 'base.html' %}
 {% load getatrr %}
 {% block body %}
-    <p><b>Day: {{ visit.date.date }}</b></p>
-    <p>Hour: {{ visit.date.hour_from }}</p>
-    {% if user|get_attr:'patient' %}
-        <p>Doctor's name: {{ visit.doctor.get_title_or_degree_display }} {{ visit.doctor.name }}</p>
-    {% else %}
-        <p>Patient's name: {{ visit.patient.name}}</p>
-    {% endif %}
-    <p>Treatment: {{ visit.procedure.name }}
-    <p>Price: {{ visit.procedure.price }} zł</p>
-    <p>Office: {{ visit.date.office }}</p>
+    <div class="align-self-start p-2 m-2">
+        <h3>Visits Details:</h3>
+    </div>
+    <div class="d-flex align-self-center row border border-primary rounded">
+        <div class="col-md-20 p-3">
+            <p><b>Day: {{ visit.date.date }}</b></p>
+            <p>Hour: {{ visit.date.hour_from }}</p>
+            {% if user|get_attr:'patient' %}
+                <p>Doctor's name: {{ visit.doctor.get_title_or_degree_display }} {{ visit.doctor.name }}</p>
+            {% else %}
+                <p>Patient's name: {{ visit.patient.name}}</p>
+            {% endif %}
+            <p>Treatment: {{ visit.procedure.name }}
+            <p>Price: {{ visit.procedure.price }} zł</p>
+            <p>Office: {{ visit.date.office }}</p>
+        </div>
+    </div>
 {% endblock %}

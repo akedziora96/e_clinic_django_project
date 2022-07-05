@@ -1,20 +1,30 @@
 {% extends 'base.html' %}
 {% load getatrr %}
 {% block body %}
-    <b>Your Visits:</b>
-    <ul>
-    {% for visit in visit_list %}
-        <li>
-            {{ visit.date.date }} {{ visit.date.visit_hour }},
-            {% if user|get_attr:'patient'%}
-            {{ visit.doctor.get_title_or_degree_display }}
-            {{ visit.doctor.name }}
-            {% else %}
-            {{ visit.patient.name }}
-            {% endif %}
-            <button><a href="{% url 'visit-details' visit.id %}">Visit Details</a></button>
-            <button><a href="{% url 'visit-cancel' visit.id %}">Cancel Visit</a></button>
-        </li>
-    {% endfor %}
-    </ul>
+    <div class="align-self-start p-2 m-2">
+        {% if user|get_attr:'patient'%}
+            <h3>Your Visits:</h3>
+        {% else %}
+            <h3>Your Patients Visits:</h3>
+        {% endif %}
+    </div>
+    <div class="d-flex align-self-center w-75 p-3 p-2">
+        <table class="table table">
+            <tbody>
+            {% for visit in visit_list %}
+                <tr>
+                    <td>{{ visit.date.date }} {{ visit.date.visit_hour }}</td>
+                    {% if user|get_attr:'patient'%}
+                        <td>{{ visit.doctor.get_title_or_degree_display }} {{ visit.doctor.name }}</td>
+                    {% else %}
+                        <td>{{ visit.patient.name }}</td>
+                    {% endif %}
+                    <td><a class="btn btn-lg btn-primary btn-sm" href="{% url 'visit-details' visit.id %}">Visit Details</a></td>
+                    <td><a class="btn btn-lg btn-danger btn-sm" href="{% url 'visit-cancel' visit.id %}">Cancel Visit</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}
+

@@ -1,11 +1,21 @@
 {% extends "base.html" %}
 
 {% block body %}
-  <h2>Sign up</h2>
-  <form method="post">
-    {% csrf_token %}
-    {{ form_user.as_p }}
-    {{ form_patient.as_p }}
-    <button type="submit">Sign Up</button>
-  </form>
+    <div class="d-flex container-fluid flex-column">
+        <p></p>
+        <div class="d-flex align-self-center">
+            <h1>Sign up</h1>
+        </div>
+        <p></p>
+        <div class="d-flex align-self-center">
+            <form method="post">
+                {% csrf_token %}
+                {{ form_user.as_p }}
+                {{ form_patient.as_p }}
+                <div class="col-md-12 text-center">
+                    <button class="btn btn-lg btn-primary" type="submit">Sign Up</button>
+                </div>
+            </form>
+        </div>
+    </div>
 {% endblock %}

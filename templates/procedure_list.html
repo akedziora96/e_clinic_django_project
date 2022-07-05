@@ -1,6 +1,21 @@
 {% extends 'base.html' %}
 {% block body %}
-    {% for procedure in procedure_list %}
-        <p><a href="{% url 'procedure-detail' procedure.id %}">{{ procedure }}</a></p>
-    {% endfor %}
+    <div class="align-self-start p-2 m-2">
+        <h3>Treatments:</h3>
+    </div>
+    <div class="d-flex align-self-center w-50 p-3 p-2 row justify-content-center">
+        <table class="table table-borderless">
+            {% for row in procedures_matrix %}
+                <tr>
+                    {% for procedure in row %}
+                        <td class="border-0">
+                            <div class="text-center">
+                                <a class="btn btn-primary" href="{% url 'procedure-detail' procedure.id %}">{{ procedure }}</a>
+                            </div>
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
 {% endblock %}

@@ -93,16 +93,16 @@ class Term(models.Model):
     def visit_hour(self):
         return f"{self.hour_from.strftime('%H:%M')}"
 
-    def is_available(self):
-        if self.visit_set.exists():
-            return False
-
-        if self.date > datetime.date.today():
+    def is_from_past(self):
+        if self.date < datetime.date.today():
             return True
-        elif self.date == datetime.date.today() and self.hour_from >= datetime.datetime.now().time():
+        elif self.date == datetime.date.today() and self.hour_from < datetime.datetime.now().time():
             return True
         else:
             return False
+
+    def is_available(self):
+        return not self.visit_set.exists() and not self.is_from_past()
 
     def __str__(self):
         return f"{self.date}, {self.hour_from}, {self.hour_to}"

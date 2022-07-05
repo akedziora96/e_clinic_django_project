@@ -1,22 +1,24 @@
 {% extends 'base.html' %}
 {% block body %}
-    <h>{{ procedure.name }}</h>
-    <table border="2">
-    <th>Treatment</th><th>Price</th><th>Doctors Performing</th>
-        <tr>
-            <td>{{ procedure.name }}</td>
-            <td>{{ procedure.price }}</td>
-            <td>
-                <ul>
+    <div class="d-flex container-fluid flex-column">
+        <p></p>
+        <div class="d-flex align-self-start">
+            <h2>Procedure Details</h2>
+        </div>
+        <p></p>
+        <div class="d-flex align-self-center row border border-primary rounded">
+            <div class="col-md-45 p-3">
+                <p>Procedure name: {{ procedure.name }}</p>
+                <p>Price: {{ procedure.price }} PLN</p>
+                <p></p>
+                <b>Performed by:</b>
                 {% for doc in procedure.doctor_set.all %}
-                    <li>
-                    <a href="{% url 'specialization-detail' doc.specializations.all.first.id  %}">
-                        {{ doc.get_title_or_degree_display }} {{ doc.name }}
-                    </a>
-                    </li>
+                    <p></p>
+                    <a href="{% url 'specialization-detail' doc.specializations.all.first.id  %}">{{ doc.get_title_or_degree_display }} {{ doc.name }}, </a>
                 {% endfor %}
-                </ul>
-            </td>
-        </tr>
-    </table>
+            </div>
+        </div>
+    </div>
+    </div>
 {% endblock %}
+

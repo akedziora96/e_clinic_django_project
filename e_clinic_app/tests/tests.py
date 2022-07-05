@@ -1,3 +1,4 @@
+import random
 from django.contrib.auth.models import User
 from django.test import TestCase, Client
 import pytest
@@ -27,6 +28,13 @@ def test_specialization_list_view(client, set_up):
 def test_specialization_detail_view(client, set_up):
     specialization = Specialization.objects.all().first()
     response = client.get(f'/specialization/{specialization.id}/')
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_specialization_detail_view_with_offset(client, set_up):
+    specialization = Specialization.objects.all().first()
+    response = client.get(f'/specialization/{specialization.id}/?week={random.randint(0,1000)}')
     assert response.status_code == 200
 
 

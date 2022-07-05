@@ -1,9 +1,13 @@
 {% extends 'base.html' %}
 {% block body %}
-<form method="post">
-    {% csrf_token %}
-    <h3>Do you want to cancel Term ? on {{ term.date }} {{ term.visit_hour }} in office no. {{ term.office }}?</h3>
-    <button type="submit">Delete</button>
-    <button><a href="{% url 'specialization-detail' term.doctor.specializations.all.first.id  %}">Cancel</a></button>
-</form>
+<div class="align-self-center p-2 m-2">
+        <form method="post">
+            {% csrf_token %}
+            <h3>Do you want to cancel Term on {{ term.date }} {{ term.visit_hour }} in office no. {{ term.office }}?</h3>
+            <div class="col-md-12 text-center">
+                <button class="btn btn-lg btn-danger" type="submit">Cancel Term</button>
+                <a class="btn btn-lg btn-primary" href="{% url 'specialization-detail' term.doctor.specializations.all.first.id  %}">Back</a>
+            </div>
+        </form>
+    </div>
 {% endblock %}

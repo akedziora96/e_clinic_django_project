@@ -9,6 +9,8 @@ from . import forms
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views import View
 from django.views.generic import ListView, DetailView, DeleteView
+
+from .functions.specializations_list_display_functions import prepare_table_rows
 from .models import Specialization, Doctor, Procedure, Visit, Patient, Term
 from .functions.datetime_functions import get_week_start_and_end, get_weekdays_names
 from .forms import RegisterFormUser, RegisterFormPatient, TermAddForm
@@ -22,6 +24,11 @@ class LandingPage(View):
 class SpecializationList(ListView):
     model = Specialization
     template_name = 'specialization_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['specializations_matrix'] = prepare_table_rows(self.object_list, col=4)
+        return context
 
 
 class SpecializationDetails(DetailView):
@@ -57,6 +64,11 @@ class SpecializationDetails(DetailView):
 class ProcedureList(ListView):
     model = Procedure
     template_name = 'procedure_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['procedures_matrix'] = prepare_table_rows(self.object_list, col=4)
+        return context
 
 
 class ProcedureDetails(DetailView):
@@ -102,7 +114,9 @@ class VisitAdd(UserPassesTestMixin, View):
 
             Visit.objects.create(patient=patient, doctor=doctor, date=date, procedure=procedure)
 
-            return redirect('main-page')
+            return redirect('user-visits')
+
+        return render(request, 'visit_add.html', {'form': form})
 
 
 class SignUpView(UserPassesTestMixin, View):

@@ -1,13 +1,21 @@
 {% extends 'base.html' %}
 {% block body %}
-    <form method="post">
-        {% csrf_token%}
-        <p>{{ message }}</p>
-        {{ form.as_p }}
-        <button type="submit" name='add_option' value="add_one">Add Term</button>
-{#        <p></p>#}
-{#        Ustaw automatycznie wypełnianie dnia wizytami zgodnie z interwałem:#}
-{#        {{ form_expansion.as_p }}#}
-{#        <button type="submit" name='add_option' value="add_multiple">Automatyczne uzupełnienie</button>#}
-{#    </form>#}
+    <div class="d-flex container-fluid flex-column">
+        <p></p>
+        <div class="d-flex align-self-center">
+            <h1>Add Term</h1>
+        </div>
+        <p></p>
+        <div class="d-flex align-self-center">
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <div class="col-md-12 text-center">
+                    <button class="btn btn-lg btn-primary btn-sm" type="submit">Add</button>
+                    <a class="btn btn-lg btn-primary btn-sm" href="{% url 'main-page' %}">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
 {% endblock %}
+

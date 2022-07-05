@@ -1,12 +1,26 @@
 {% extends 'base.html' %}
 {% block body %}
-    <p>Patient's name: {{ patient.name }}</p>
-    <p>Doctor's name: {{ doctor.get_title_or_degree_display}} {{ doctor.name }}</p>
-    <p>Visit date: {{ date.date}} {{ date.visit_hour }}</p>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Make an Appointment</button>
+    <div class="d-flex container-fluid flex-column">
         <p></p>
-    </form>
+        <div class="d-flex align-self-center">
+            <h2>Make An Appointment</h2>
+        </div>
+        <p></p>
+        <div class="d-flex align-self-center row">
+            <div class="col-md-15">
+                <p>Patient's name: {{ patient.name }}</p>
+                <p>Doctor's name: {{ doctor.get_title_or_degree_display}} {{ doctor.name }}</p>
+                <p>Visit date: {{ date.date}} {{ date.visit_hour }}</p>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <div class="col-md-12 text-center">
+                        <button class="btn btn-lg btn-primary btn-sm" type="submit">Make an Appointment</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    </div>
 {% endblock %}
+
