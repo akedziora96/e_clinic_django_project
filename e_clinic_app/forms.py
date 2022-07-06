@@ -9,6 +9,7 @@ from localflavor.pl.forms import PLPESELField
 from e_clinic_app.models import Visit, Patient, Term
 from e_clinic_app.validators import phone_regex_validator, person_name_validator
 
+from django.contrib.admin.widgets import AdminDateWidget
 
 class AddVisitForm(forms.ModelForm):
 
@@ -59,6 +60,12 @@ class TermAddForm(forms.ModelForm):
         hour_to = data.get('hour_to')
         office = data.get('office')
 
+        if hour_from > hour_to:
+            raise ValidationError(f"End must be after beginning of visit!")
+
+        if date.weekday() + 1 == 7:
+            raise ValidationError(f"Clinic is closed on Sundays!")
+
         possible_term = Term.objects.filter(date=date)
         pt = possible_term.filter(hour_from__lte=hour_from, hour_to__gte=hour_to)
         pt |= possible_term.filter(hour_from__lte=hour_from, hour_to__gt=hour_from, hour_to__lte=hour_to)
@@ -75,7 +82,7 @@ class TermAddForm(forms.ModelForm):
         fields = '__all__'
         exclude = ('doctor',)
         widgets = {
-            'date': forms.SelectDateWidget(),
+            'date': forms.TextInput(attrs={'type': 'date'}),
             'hour_from': forms.TimeInput(format='%H:%M'),
             'hour_to': forms.TimeInput(format='%H:%M')
         }

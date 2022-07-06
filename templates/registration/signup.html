@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+{% load crispy_forms_filters %}
 {% block body %}
     <div class="d-flex container-fluid flex-column">
         <p></p>
@@ -7,11 +7,11 @@
             <h1>Sign up</h1>
         </div>
         <p></p>
-        <div class="d-flex align-self-center">
+        <div class="d-flex align-self-center flex-column">
             <form method="post">
                 {% csrf_token %}
-                {{ form_user.as_p }}
-                {{ form_patient.as_p }}
+                {{ form_user|crispy  }}
+                {{ form_patient|crispy }}
                 <div class="col-md-12 text-center">
                     <button class="btn btn-lg btn-primary" type="submit">Sign Up</button>
                 </div>

@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block body %}
-<div class="align-self-center p-2 m-2">
+<div class="align-self-center p-2 m-2 my-auto">
         <form method="post">
             {% csrf_token %}
             <h3>Do you want to cancel Term on {{ term.date }} {{ term.visit_hour }} in office no. {{ term.office }}?</h3>

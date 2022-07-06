@@ -1,4 +1,14 @@
 {% extends 'base.html'%}
 {% block body %}
-    <p>Hello on the main page.</p>
+    <div class="d-flex justify-content-center align-self-center my-auto">
+        <div class="jumbotron jumbotron-fluid container p-2 bg-white">
+            <h1 class="display-4">Hello on main page!</h1>
+            <p class="lead">Lorem ipsum dolor sit amet, consectetur adipisicing elit. A deserunt explicabo fuga fugit magnam maiores mollitia natus necessitatibus nobis optio, quas quisquam ratione similique vel veniam! Fugiat obcaecati placeat voluptates.</p>
+            <hr class="my-4">
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. A alias asperiores, aspernatur dolorem, doloribus ea excepturi, expedita id illo inventore maxime nam nesciunt nobis officiis possimus velit vero voluptas voluptatibus?</p>
+            <p class="lead">
+                <a class="btn btn-primary btn-lg" href="{% url 'specializations' %}" role="button">Find your doctor!</a>
+            </p>
+        </div>
+    </div>
 {% endblock %}

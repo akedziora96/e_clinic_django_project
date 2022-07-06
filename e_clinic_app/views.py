@@ -91,7 +91,7 @@ class VisitAdd(UserPassesTestMixin, View):
     def get(self, request, doc_id, date, hour):
         patient = get_object_or_404(Patient, user=request.user)
         doctor = get_object_or_404(Doctor, id=doc_id)
-        date = get_object_or_404(Term, date=date, hour_from=hour)
+        date = get_object_or_404(Term, doctor=doctor, date=date, hour_from=hour)
         form = forms.AddVisitForm(initial={'doctor': doctor, 'date': date})
 
         procedures = doctor.procedures.all()
@@ -105,7 +105,7 @@ class VisitAdd(UserPassesTestMixin, View):
         user = request.user
         patient = get_object_or_404(Patient, user=user)
         doctor = get_object_or_404(Doctor, id=doc_id)
-        date = get_object_or_404(Term, date=date, hour_from=hour)
+        date = get_object_or_404(Term, doctor=doctor, date=date, hour_from=hour)
         form = forms.AddVisitForm(request.POST)
 
         if form.is_valid():
@@ -238,4 +238,4 @@ class TermCancel(UserPassesTestMixin, DeleteView):
         return getattr(user, 'doctor', False)
 
     def get_success_url(self):
-        return reverse_lazy('specialization-detail', kwargs={'pk': self.object.doctor.specializations.all().first().id})
+        return reverse_lazy('specialization-detail', kwargs={'pk': self.object.doctor.specializations.first().id})
