@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load getatrr %}
+{% block body %}
+    <div class="d-flex container-fluid flex-column">
+        <p></p>
+        <div class="d-flex align-self-start">
+            <h2>User Status</h2>
+        </div>
+        <p></p>
+        <div class="d-flex align-self-center border border-primary rounded">
+            <div class="col-md-45 p-3">
+                <p>Name: {{ user.first_name }} {{ user.last_name_name }}</p>
+                {% if user|get_attr:'patient' %}
+                    <p><span><b>Status: patient</b></span></p>
+                    <p>Pesel: {{ user.patient.pesel }}</p>
+                    <p>Phone number: {{ user.patient.phone_number }}</p>
+                {% else %}
+                    <p><span><b>Status: doctor</b></span></p>
+                    <p>Pesel: {{ user.doctor.pesel }}</p>
+                    <p>PWZ (doctor's licence): {{ user.doctor.pwz }}</p>
+                {% endif %}
+            </div>
+        </div>
+        {% if user|get_attr:'patient' %}
+        <div class="col-md-12 text-center p-2">
+            <a class="btn btn-lg btn-primary" href="{% url 'edit-user' %}">Edit your details</a>
+        </div>
+        {% endif %}
+    </div>
+{% endblock %}

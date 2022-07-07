@@ -1,4 +1,6 @@
 import random
+import datetime
+
 from django.contrib.auth.models import User
 from django.test import TestCase, Client
 import pytest
@@ -240,8 +242,8 @@ def test_add_term_view(client, set_up):
 
     fake_term = {
         'date': fake.date(),
-        'hour_from': fake.time(),
-        'hour_to': fake.time(),
+        'hour_from': "08:00",
+        'hour_to': "16:00",
         'office': office.id,
     }
 
@@ -250,3 +252,37 @@ def test_add_term_view(client, set_up):
     assert post_response.status_code == 302
     assert post_response.url == f'/specialization/{doctor.specializations.first().id}/'
     assert term_count_after_create == term_count_before_create + 1
+
+
+def test_add_multiple_term_view(client, set_up):
+    term_count_before_create = Term.objects.count()
+    patient = Patient.objects.first()
+    doctor = Doctor.objects.first()
+    office = Office.objects.first()
+
+    response = client.get(f'/add_multiple_term/')
+    assert response.status_code == 302
+
+    user = patient.user
+    client.force_login(user=user)
+    response = client.get(f'/add_multiple_term/')
+    assert response.status_code == 403
+
+    user = doctor.user
+    client.force_login(user=user)
+    response = client.get(f'/add_multiple_term/')
+    assert response.status_code == 200
+
+    fake_term = {
+        'date': fake.date(),
+        'hour_from': "08:00",
+        'hour_to': "16:00",
+        'office': office.id,
+        'visit_time': 60
+    }
+
+    post_response = client.post(f'/add_multiple_term/', fake_term)
+    term_count_after_create = Term.objects.count()
+    assert post_response.status_code == 302
+    assert post_response.url == f'/specialization/{doctor.specializations.first().id}/'
+    assert term_count_after_create == term_count_before_create + 8

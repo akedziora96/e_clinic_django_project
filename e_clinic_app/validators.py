@@ -1,3 +1,5 @@
+import re
+
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 
@@ -30,5 +32,36 @@ phone_regex_validator = RegexValidator(
 )
 
 
+default_error_messages = {
+    'invalid': 'National Identification Number consists of 11 digits.',
+    'checksum': 'Wrong checksum for the National Identification Number.',
+    'birthdate': 'The National Identification Number contains an invalid birth date.'
+}
+
+
+def has_valid_checksum(number):
+    """Calculates a checksum with the provided algorithm."""
+    multiple_table = (1, 3, 7, 9, 1, 3, 7, 9, 1, 3, 1)
+    result = 0
+    for i, digit in enumerate(number):
+        result += int(digit) * multiple_table[i]
+    return result % 10 == 0
+
+
+def pesel_validator(number):
+    try:
+        number = str(number)
+    except TypeError:
+        raise ValidationError(default_error_messages['invalid'], code='invalid')
+    if not re.match(r'^\d{11}$', number):
+        print('123')
+        raise ValidationError(default_error_messages['invalid'], code='invalid')
+    if not has_valid_checksum(str(number)):
+        raise ValidationError(default_error_messages['checksum'], code='checksum')
+    return int(number)
+
+
 if __name__ == '__main__':
-    print(pwz_validator(5425741))
+    # print(pwz_validator(5425741))
+    print(pesel_validator(73100677372))
+    print(has_valid_checksum(str(73100677372)))

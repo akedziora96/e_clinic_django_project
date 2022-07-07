@@ -34,12 +34,15 @@ urlpatterns = [
     path('login/', auth_views.LoginView.as_view(redirect_authenticated_user=True), name="login-page"),
     path('logout/', auth_views.LogoutView.as_view(), name="logout-page"),
     path('signup/', views.SignUpView.as_view(), name="signup"),
+    path('edit_user/', views.EditUserView.as_view(), name="edit-user"),
+    path('user_status/<int:pk>/', views.UserStatus.as_view(), name="user-status"),
 
     path('yourvisits/', views.UserVisits.as_view(), name="user-visits"),
     path('visit/<int:pk>/', views.VisitDetails.as_view(), name="visit-details"),
     path('visit/<int:pk>/cancel/', views.VisitCancel.as_view(), name="visit-cancel"),
 
     path('add_term/', views.TermAdd.as_view(), name="add-term"),
+    path('add_multiple_term/', views.MulitpleTermAdd.as_view(), name="add-multiple-term"),
     path('cancel_term/<int:pk>/', views.TermCancel.as_view(), name="cancel-term")
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

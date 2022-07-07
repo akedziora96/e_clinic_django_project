@@ -1,19 +1,19 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% load crispy_forms_filters %}
 {% block body %}
-    <div class="d-flex container-fluid flex-column my-auto">
+    <div class="d-flex container-fluid flex-column">
         <p></p>
         <div class="d-flex align-self-center">
-            <h1>Log In</h1>
+            <h1>Edit User</h1>
         </div>
         <p></p>
         <div class="d-flex align-self-center flex-column">
             <form method="post">
                 {% csrf_token %}
-                {{ form|crispy }}
+                {{ form_user|crispy  }}
+                {{ form_patient|crispy }}
                 <div class="col-md-12 text-center">
-                    <button class="btn btn-lg btn-primary" type="submit">Log In</button>
-                    <a class="btn btn-lg btn-primary" href="{% url 'signup' %}">Sign Up</a>
+                    <button class="btn btn-lg btn-primary" type="submit">Save</button>
                 </div>
             </form>
         </div>

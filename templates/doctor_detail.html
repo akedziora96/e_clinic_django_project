@@ -1,12 +1,23 @@
 {% extends 'base.html' %}
 {% block body %}
-    <p><b>Name: {{ doctor.name }}</b></p>
-    <p>Degree: {{ doctor.get_title_or_degree_display }}</p>
-    <p>
-        Specialization in:
-        {% for specialization in doctor.specializations.all%}
-            {{ specialization.name }}
-        {% endfor %}
-    </p>
-    <p>PWZ (doctor's licence): {{ doctor.pwz }}</p>
+    <div class="d-flex container-fluid flex-column">
+        <p></p>
+        <div class="d-flex align-self-start">
+            <h2>Doctor Details</h2>
+        </div>
+        <p></p>
+        <div class="d-flex align-self-center border border-primary rounded">
+            <div class="col-md-45 p-3">
+                <p>Name: {{ doctor.name }}</p>
+                <p>Degree: {{ doctor.get_title_or_degree_display }}</p>
+                <p></p>
+                <p><span><b>Specialization in:</b></span>
+                {% for specialization in doctor.specializations.all %}
+                    {{ specialization.name }},
+                {% endfor %}
+                </p>
+                <p>PWZ (doctor's licence): {{ doctor.pwz }}</p>
+            </div>
+        </div>
+    </div>
 {% endblock %}

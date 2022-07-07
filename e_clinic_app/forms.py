@@ -5,11 +5,10 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
-from localflavor.pl.forms import PLPESELField
+
 from e_clinic_app.models import Visit, Patient, Term
 from e_clinic_app.validators import phone_regex_validator, person_name_validator
 
-from django.contrib.admin.widgets import AdminDateWidget
 
 class AddVisitForm(forms.ModelForm):
 
@@ -19,6 +18,13 @@ class AddVisitForm(forms.ModelForm):
 
 
 class RegisterFormUser(UserCreationForm):
+
+    def __init__(self, *args, **kwargs):
+        super(RegisterFormUser, self).__init__(*args, **kwargs)
+
+        self.fields['first_name'].required = True
+        self.fields['last_name'].required = True
+        self.fields['email'].required = True
 
     class Meta:
         model = User
@@ -34,7 +40,6 @@ class RegisterFormUser(UserCreationForm):
 
 
 class RegisterFormPatient(forms.ModelForm):
-    pesel = PLPESELField(required=True)
     phone_number = forms.CharField(validators=[phone_regex_validator], max_length=17, required=True)
 
     class Meta:
@@ -83,7 +88,13 @@ class TermAddForm(forms.ModelForm):
         exclude = ('doctor',)
         widgets = {
             'date': forms.TextInput(attrs={'type': 'date'}),
-            'hour_from': forms.TimeInput(format='%H:%M'),
-            'hour_to': forms.TimeInput(format='%H:%M')
+            'hour_from': forms.TextInput(attrs={'type': 'time'}),
+            'hour_to': forms.TextInput(attrs={'type': 'time'}),
         }
+
+
+class MultipleTermAddForm(TermAddForm):
+    visit_time = forms.ChoiceField(choices={(20, "20 minutes"), (30, "30 minutes"), (60, "1 hour")})
+
+
 

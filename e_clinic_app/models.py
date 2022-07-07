@@ -4,6 +4,8 @@ from django.contrib.auth.models import User, AbstractUser
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
+from e_clinic_app.validators import phone_regex_validator, pesel_validator, pwz_validator
+
 IDENTIFICATION = [
     (1, "ID card"),
     (2, "Passport"),
@@ -20,7 +22,7 @@ TITLES = [
 
 class Person(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    pesel = models.IntegerField(unique=True, verbose_name="PESEL (polish ID number)")
+    pesel = models.IntegerField(unique=True, verbose_name="PESEL (polish ID number)", validators=[pesel_validator])
 
     class Meta:
         abstract = True
@@ -32,6 +34,9 @@ class Person(models.Model):
     def name(self):
         return f"{self.user.first_name} {self.user.last_name}"
 
+
+
+
     # @property
     # def date_of_birth(self):
     #     pesel = str(self.pesel)
@@ -42,7 +47,9 @@ class Person(models.Model):
 
 class Patient(Person):
     identification_type = models.IntegerField(choices=IDENTIFICATION, verbose_name="identification type")
-    phone_number = models.CharField(max_length=11, unique=True, verbose_name="phone number")
+    phone_number = models.CharField(
+        max_length=11, unique=True, verbose_name="phone number", validators=[phone_regex_validator]
+    )
 
 
 class Specialization(models.Model):
@@ -54,14 +61,16 @@ class Specialization(models.Model):
 
 class Procedure(models.Model):
     name = models.CharField(max_length=60, unique=True, verbose_name="treatment name")
-    price = models.DecimalField(max_digits=6, decimal_places=2, verbose_name="treatment price")
+    price = models.DecimalField(
+        max_digits=6, decimal_places=2, verbose_name="treatment price", validators=[MinValueValidator(0)]
+    )
 
     def __str__(self):
         return f"{self.name} ({self.price} PLN)"
 
 
 class Doctor(Person):
-    pwz = models.IntegerField(unique=True, verbose_name="PWZ (doctor's license")
+    pwz = models.IntegerField(unique=True, verbose_name="PWZ (doctor's license", validators=[pwz_validator])
     specializations = models.ManyToManyField(Specialization, verbose_name="Specialization")
     title_or_degree = models.IntegerField(
         choices=TITLES, verbose_name="Scientific degree"
