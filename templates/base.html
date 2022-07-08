@@ -66,6 +66,7 @@
                         {% if user|get_attr:'patient' %}
                             <a class="dropdown-item" href={% url 'edit-user' %}>Edit Your Details</a>
                         {% endif %}
+                        <a class="dropdown-item" href="{% url 'change-password' %}">Change Password</a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="{% url 'logout-page' %}"><b>Log out</b></a>
                         </div>

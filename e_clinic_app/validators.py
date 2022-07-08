@@ -1,10 +1,16 @@
+import datetime
 import re
 
 from django.core.exceptions import ValidationError
-from django.core.validators import RegexValidator
+
+default_error_messages = {
+    'invalid': 'National Identification Number consists of 11 digits.',
+    'checksum': 'Wrong checksum for the National Identification Number.',
+}
 
 
 def person_name_validator(name):
+    """Checks if name contains only latin letters and has no whitespaces"""
     if len(name.strip()) == 0:
         raise ValidationError("Field can not be empty!")
     for char in name:
@@ -16,6 +22,7 @@ def person_name_validator(name):
 
 
 def pwz_validator(pwz_number):
+    """Checks if pwz number contains 7 digits and has valid checksum"""
     pwz_number = str(pwz_number)
     if not len(pwz_number):
         raise ValidationError("PWZ number must contain 7 digits!")
@@ -26,17 +33,11 @@ def pwz_validator(pwz_number):
     return int(pwz_number)
 
 
-phone_regex_validator = RegexValidator(
-        regex=r'^\+?1?\d{9,11}$',
-        message="Phone number must be entered in the format: '+999999999'. Up to 11 digits allowed."
-)
-
-
-default_error_messages = {
-    'invalid': 'National Identification Number consists of 11 digits.',
-    'checksum': 'Wrong checksum for the National Identification Number.',
-    'birthdate': 'The National Identification Number contains an invalid birth date.'
-}
+def phone_regex_validator(phone_number):
+    """Checks if phone number is propper formated"""
+    if not re.fullmatch(r'^\+?1?\d{9,11}$', phone_number):
+        raise ValidationError("Phone number must be entered in the format: '+999999999'. Up to 11 digits allowed.")
+    return phone_number
 
 
 def has_valid_checksum(number):
@@ -49,6 +50,7 @@ def has_valid_checksum(number):
 
 
 def pesel_validator(number):
+    """Check if pesell contains 11 digits and has valid checksum"""
     try:
         number = str(number)
     except TypeError:
@@ -61,7 +63,15 @@ def pesel_validator(number):
     return int(number)
 
 
+def date_validator(date):
+    """Checks if date of term is not from past."""
+    if date < datetime.date.today():
+        raise ValidationError("Date is from the past")
+    return date
+
+
 if __name__ == '__main__':
     # print(pwz_validator(5425741))
-    print(pesel_validator(73100677372))
-    print(has_valid_checksum(str(73100677372)))
+    # print(pesel_validator(73100677372))
+    # print(has_valid_checksum(str(73100677372)))
+    print(phone_regex_validator("+4850595860"))

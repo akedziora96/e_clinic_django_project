@@ -1,14 +1,14 @@
 import random
-import datetime
 
 from django.contrib.auth.models import User
-from django.test import TestCase, Client
 import pytest
 from faker import Faker
 
 from e_clinic_app.models import Specialization, Procedure, Doctor, Visit, Term, Patient, Office
+from e_clinic_app.tests.utilities import fake_term
 
 fake = Faker("pl_PL")
+
 
 @pytest.mark.repeat(5)
 def test_repeat_decorator():
@@ -31,6 +31,7 @@ def test_landing_page_view(client):
 def test_specialization_list_view(client, set_up):
     response = client.get('/specializations/')
     assert response.status_code == 200
+    assert response.context.get('specialization_list').count() == 10
 
 
 @pytest.mark.django_db
@@ -38,19 +39,22 @@ def test_specialization_detail_view(client, set_up):
     specialization = Specialization.objects.all().first()
     response = client.get(f'/specialization/{specialization.id}/')
     assert response.status_code == 200
+    assert response.context.get('specialization') == specialization
 
 
 @pytest.mark.django_db
 def test_specialization_detail_view_with_offset(client, set_up):
-    specialization = Specialization.objects.all().first()
+    specialization = Specialization.objects.first()
     response = client.get(f'/specialization/{specialization.id}/?week={random.randint(0,1000)}')
     assert response.status_code == 200
+    assert response.context.get('specialization') == specialization
 
 
 @pytest.mark.django_db
 def test_procedures_list_view(client, set_up):
     response = client.get('/procedures/')
     assert response.status_code == 200
+    assert response.context.get('procedure_list').count() == 10
 
 
 @pytest.mark.django_db
@@ -58,6 +62,7 @@ def test_procedure_detail_view(client, set_up):
     procedure = Procedure.objects.first()
     response = client.get(f'/procedure/{procedure.id}/')
     assert response.status_code == 200
+    assert response.context.get('procedure') == procedure
 
 
 @pytest.mark.django_db
@@ -65,6 +70,7 @@ def test_doctor_detail_view(client, set_up):
     doctor = Doctor.objects.first()
     response = client.get(f'/doctor/{doctor.id}/')
     assert response.status_code == 200
+    assert response.context.get('doctor') == doctor
 
 
 @pytest.mark.django_db
@@ -92,34 +98,52 @@ def test_cancel_visit_view_with_loging_in(client, set_up):
 
 
 @pytest.mark.django_db
-def test_user_visits_view_without_loging_in(client, set_up):
-    response = client.get(f'/yourvisits/')
-    assert response.status_code == 302
-    assert response.url == '/login/?next=/yourvisits/'
+def test_user_visits_view(client, set_up):
+    patient = Patient.objects.first()
+    doctor = Doctor.objects.first()
+    visit = patient.visit_set.first()
 
-
-@pytest.mark.django_db
-def test_user_visits_view_with_loging_in(client, set_up):
-    user = User.objects.order_by('?').first()
-    client.force_login(user=user)
-    response = client.get(f'/yourvisits/')
-    assert response.status_code == 200
-
-
-@pytest.mark.django_db
-def test_user_visits_view_without_loging_in(client, set_up):
-    visit = Visit.objects.order_by('?').first()
     response = client.get(f'/visit/{visit.id}/')
     assert response.status_code == 302
     assert response.url == f'/login/?next=/visit/{visit.id}/'
 
+    user = patient.user
+    client.force_login(user=user)
+    response = client.get(f'/visit/{visit.id}/')
+    assert response.status_code == 200
+    assert response.context.get('visit') == visit
+
+    client.logout()
+
+    visit = doctor.visit_set.first()
+
+    response = client.get(f'/visit/{visit.id}/')
+    assert response.status_code == 302
+    assert response.url == f'/login/?next=/visit/{visit.id}/'
+
+    user = doctor.user
+    client.force_login(user=user)
+    response = client.get(f'/visit/{visit.id}/')
+    assert response.status_code == 200
+    assert response.context.get('visit') == visit
+
 
 @pytest.mark.django_db
-def test_cancel_term_view_with_loging_in(client, set_up):
+def test_cancel_term_view(client, set_up):
     before_cancel_term_counter = Term.objects.count()
 
     doctor = Doctor.objects.first()
+    patien = Patient.objects.first()
     term = doctor.term_set.order_by('?').first()
+
+    response = client.get(f'/cancel_term/{term.id}/')
+    assert response.status_code == 302
+
+    user = patien.user
+    client.force_login(user=user)
+
+    response = client.get(f'/cancel_term/{term.id}/')
+    assert response.status_code == 403
 
     user = doctor.user
     client.force_login(user=user)
@@ -140,9 +164,15 @@ def test_login_view(client, set_up):
     username = 'test_user'
     password = 'test_pass'
     User.objects.create_user(username=username, password=password)
+
     response = client.get('/login/')
     assert response.status_code == 200
+
     client.login(username=username, password=password)
+    response = client.get('/login/')
+    assert response.status_code == 302
+    assert response.url == '/'
+
     post_response = client.post('/login/')
     assert post_response.url == f'/'
 
@@ -152,6 +182,10 @@ def test_logout_view(client, set_up):
     username = 'test_user'
     password = 'test_pass'
     User.objects.create_user(username=username, password=password)
+    response = client.get('/logout/')
+    assert response.status_code == 302
+    assert response.url == f'/login/'
+
     client.login(username=username, password=password)
     response = client.get('/logout/')
     assert response.status_code == 302
@@ -195,18 +229,16 @@ def test_signup_view(client, set_up):
     response = client.get(f'/signup/')
     assert response.status_code == 200
 
-    password = fake.password()
-
     fake_patient = {
         'username': fake.user_name(),
         'first_name': fake.first_name(),
         'last_name': fake.last_name(),
         'email': fake.email(),
-        'password1': password,
-        'password2': password,
+        'password1': 'superstrongpassword12345',
+        'password2': 'superstrongpassword12345',
         'pesel': fake.pesel(),
         'identification_type': random.randint(1, 2),
-        'phone_number': 48505958860
+        'phone_number': '48505958860'
     }
 
     post_response = client.post(f'/signup/', fake_patient)
@@ -240,25 +272,20 @@ def test_add_term_view(client, set_up):
     response = client.get(f'/add_term/')
     assert response.status_code == 200
 
-    fake_term = {
-        'date': fake.date(),
-        'hour_from': "08:00",
-        'hour_to': "16:00",
-        'office': office.id,
-    }
+    data = fake_term(doctor, multiple=False)
 
-    post_response = client.post(f'/add_term/', fake_term)
+    post_response = client.post(f'/add_term/', data)
     term_count_after_create = Term.objects.count()
     assert post_response.status_code == 302
     assert post_response.url == f'/specialization/{doctor.specializations.first().id}/'
     assert term_count_after_create == term_count_before_create + 1
 
 
+@pytest.mark.django_db
 def test_add_multiple_term_view(client, set_up):
     term_count_before_create = Term.objects.count()
     patient = Patient.objects.first()
     doctor = Doctor.objects.first()
-    office = Office.objects.first()
 
     response = client.get(f'/add_multiple_term/')
     assert response.status_code == 302
@@ -273,16 +300,89 @@ def test_add_multiple_term_view(client, set_up):
     response = client.get(f'/add_multiple_term/')
     assert response.status_code == 200
 
-    fake_term = {
-        'date': fake.date(),
-        'hour_from': "08:00",
-        'hour_to': "16:00",
-        'office': office.id,
-        'visit_time': 60
-    }
+    data, minutes_for_visits, time_for_visit = fake_term(doctor, multiple=True)
 
-    post_response = client.post(f'/add_multiple_term/', fake_term)
+    post_response = client.post(f'/add_multiple_term/', data)
     term_count_after_create = Term.objects.count()
     assert post_response.status_code == 302
     assert post_response.url == f'/specialization/{doctor.specializations.first().id}/'
-    assert term_count_after_create == term_count_before_create + 8
+    assert term_count_after_create == term_count_before_create + int(minutes_for_visits/time_for_visit)
+
+
+@pytest.mark.django_db
+def test_change_password_view(client, set_up):
+    username = 'test_user'
+    password = 'test_pass'
+    User.objects.create_user(username=username, password=password)
+    response = client.get(f'/change_password/')
+    assert response.status_code == 302
+
+    client.login(username=username, password=password)
+    response = client.get(f'/change_password/')
+    assert response.status_code == 200
+
+    data = {
+        'old_password': password,
+        'new_password1': 'superstrongpassword12345',
+        'new_password2': 'superstrongpassword12345'
+    }
+
+    post_response = client.post(f'/change_password/', data)
+    assert post_response.status_code == 302
+    assert post_response.url == '/login/'
+
+    client.login(username=username, password='superstrongpassword12345')
+    response = client.get('/login/')
+    assert response.status_code == 302
+    assert response.url == '/'
+
+    post_response = client.post('/login/')
+    assert post_response.url == f'/'
+
+
+@pytest.mark.django_db
+def test_edit_user_view(client, set_up):
+    patient = Patient.objects.first()
+    doctor = Doctor.objects.first()
+
+    response = client.get(f'/edit_user/')
+    assert response.status_code == 302
+
+    user = doctor.user
+    client.force_login(user=user)
+    response = client.get(f'/edit_user/')
+    assert response.status_code == 302
+
+    user = patient.user
+    client.force_login(user=user)
+    response = client.get(f'/edit_user/')
+    assert response.status_code == 200
+
+    new_user_name = fake.user_name()
+    new_first_name = fake.first_name()
+    new_last_name = fake.last_name()
+    new_email = fake.email()
+    new_pesel = fake.pesel()
+    new_identification_type = random.randint(1, 2)
+
+    data = {
+        'username': new_user_name,
+        'first_name': new_first_name,
+        'last_name': new_last_name,
+        'email': new_email,
+        'pesel': new_pesel,
+        'identification_type': new_identification_type,
+        'phone_number': '48505958860'
+    }
+
+    post_response = client.post(f'/edit_user/', data)
+    assert post_response.status_code == 302
+    assert post_response.url == '/'
+    patient = Patient.objects.first()
+    user = patient.user
+    assert user.username == new_user_name
+    assert user.first_name == new_first_name
+    assert user.last_name == new_last_name
+    assert user.email == new_email
+    assert patient.identification_type == new_identification_type
+    assert patient.phone_number == '48505958860'

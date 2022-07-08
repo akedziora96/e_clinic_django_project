@@ -11,10 +11,15 @@ WEEKDAYS = {
 
 
 def get_weekdays_names(dates):
+    """Generaties dicionary with dates as items and day names of these dates as keys."""
     return {WEEKDAYS[date.weekday() + 1]: date.strftime("%d/%m") for date in dates}
 
 
 def get_week_start_and_end(week_offset=0):
+    """
+    Takes week_offset which is number of weeks between a selected week and a current week. Next it calculates
+    date of monday (beginning of week) and saturday (end of week) of the selected week.
+    """
     day_offset = 7 * week_offset
     now = datetime.now()
     offset_now = now + timedelta(days=day_offset)

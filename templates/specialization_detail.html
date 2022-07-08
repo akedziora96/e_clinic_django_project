@@ -47,9 +47,15 @@
                                                 <div class="borderless">
                                                     {% if user|get_attr:'doctor' and term.doctor == user.doctor and not term.is_from_past%}
                                                         <div class="dropdown">
+                                                            {% if not term.visit_set.all.exists %}
                                                             <button class="btn btn-primary dropdown-toggle btn-sm" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                                 {{ term.visit_hour }}
                                                             </button>
+                                                            {% else %}
+                                                            <button class="btn btn-secondary dropdown-toggle btn-sm" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                {{ term.visit_hour }}
+                                                            </button>
+                                                            {% endif %}
                                                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                                 {% if term.visit_set.all.exists %}
                                                                     <a class="dropdown-item" href="{% url 'visit-details' term.find_visit %}">Visit Details</a>

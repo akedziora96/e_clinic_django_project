@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
@@ -7,10 +5,11 @@ from django.core.exceptions import ValidationError
 
 
 from e_clinic_app.models import Visit, Patient, Term
-from e_clinic_app.validators import phone_regex_validator, person_name_validator
+from e_clinic_app.validators import person_name_validator
 
 
 class AddVisitForm(forms.ModelForm):
+    """Takes procedure."""
 
     class Meta:
         model = Visit
@@ -18,6 +17,7 @@ class AddVisitForm(forms.ModelForm):
 
 
 class RegisterFormUser(UserCreationForm):
+    """Takes information needed to create User."""
 
     def __init__(self, *args, **kwargs):
         super(RegisterFormUser, self).__init__(*args, **kwargs)
@@ -40,7 +40,7 @@ class RegisterFormUser(UserCreationForm):
 
 
 class RegisterFormPatient(forms.ModelForm):
-    phone_number = forms.CharField(validators=[phone_regex_validator], max_length=17, required=True)
+    """Takes information needed to create Patient."""
 
     class Meta:
         model = Patient
@@ -48,16 +48,36 @@ class RegisterFormPatient(forms.ModelForm):
         exclude = ('user', 'email',)
 
 
-class TermAddForm(forms.ModelForm):
+class EditFormUser(RegisterFormUser):
+    """
+    Takes information needed to edit User. Password fields are disabled.
+    To edit patient you can use RegisterFormPatient.
+    """
 
     def __init__(self, *args, **kwargs):
+        super(EditFormUser, self).__init__(*args, **kwargs)
+        del self.fields['password1']
+        del self.fields['password2']
+
+    class Meta:
+        model = User
+        fields = ('username', 'first_name', 'last_name', 'email',)
+
+
+class TermAddForm(forms.ModelForm):
+    """Takes information needed to create Term."""
+
+    def __init__(self, *args, **kwargs):
+        """Enable to use User object in validation"""
         self.user = kwargs.pop('user', None)
         super(TermAddForm, self).__init__(*args, **kwargs)
-        self.fields['date'].initial = datetime.today()
-        self.fields['hour_from'].initial = "08:00"
-        self.fields['hour_to'].initial = "16:00"
 
     def clean(self):
+        """
+        Validate if there is no intersection between new potential term and terms allready added
+        (date, time, doctors and offices). Method also check if term is not set on Sundays and end of term
+        is after start.
+        """
         data = super().clean()
 
         date = data.get('date')
@@ -80,7 +100,7 @@ class TermAddForm(forms.ModelForm):
         pt2 |= pt.filter(doctor=self.user.doctor)
 
         if pt2.exists():
-            raise ValidationError(f"Office is already occupied!")
+            raise ValidationError(f"Office is already occupied in this term!")
 
     class Meta:
         model = Term
@@ -94,6 +114,7 @@ class TermAddForm(forms.ModelForm):
 
 
 class MultipleTermAddForm(TermAddForm):
+    """Is extension of TermAddForm. The form is extended by visit_time field needed to auto add  multiple terms."""
     visit_time = forms.ChoiceField(choices={(20, "20 minutes"), (30, "30 minutes"), (60, "1 hour")})
 
 
