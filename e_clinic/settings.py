@@ -78,17 +78,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'e_clinic.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
-
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 
@@ -133,4 +122,11 @@ STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = 'main-page'
+
 LOGOUT_REDIRECT_URL = 'login-page'
+
+try:
+    from e_clinic.local_settings import DATABASES
+except ModuleNotFoundError:
+    print("No database configuration in local_settings.py!")
+    exit(0)

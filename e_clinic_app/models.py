@@ -24,7 +24,9 @@ TITLES = [
 class Person(models.Model):
     """Abstract parent model for Doctor and Patient."""
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    pesel = models.IntegerField(unique=True, verbose_name="PESEL (polish ID number)", validators=[pesel_validator])
+    pesel = models.CharField(
+        max_length=11, unique=True, verbose_name="PESEL (polish ID number)", validators=[pesel_validator]
+    )
 
     class Meta:
         abstract = True
