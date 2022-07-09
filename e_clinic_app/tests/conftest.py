@@ -8,6 +8,7 @@ from django.test import Client
 import pytest
 
 from e_clinic_app.models import Specialization, Procedure, Doctor, Visit, Term, Patient, Office
+from e_clinic_app.tests.utilities import fake_phone_number
 
 fake = Faker("pl_PL")
 
@@ -42,7 +43,7 @@ def set_up(db):
 
         patient = Patient.objects.create(user=user, pesel=fake.pesel(),
                                          identification_type=random.randint(1, 2),
-                                         phone_number=fake.phone_number())
+                                         phone_number=fake_phone_number())
 
         office = Office.objects.create(number=random.randint(0, 100))
 

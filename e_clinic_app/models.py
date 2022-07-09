@@ -44,7 +44,7 @@ class Patient(Person):
     """Represents patient."""
     identification_type = models.IntegerField(choices=IDENTIFICATION, verbose_name="identification type")
     phone_number = models.CharField(
-        max_length=11, unique=True, verbose_name="phone number", validators=[phone_regex_validator]
+        max_length=15, unique=True, verbose_name="phone number", validators=[phone_regex_validator]
     )
 
 

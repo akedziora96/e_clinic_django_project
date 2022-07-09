@@ -74,7 +74,8 @@ def test_doctor_detail_view(client, set_up):
 
 
 @pytest.mark.django_db
-def test_cancel_visit_view_with_loging_in(client, set_up):
+def test_cancel_visit_view(client, set_up):
+    """Tests if only doctors and patients have permission to cancel their visits."""
     before_cancel_visit_counter = Visit.objects.count()
 
     user = User.objects.order_by('?').first()
@@ -96,9 +97,42 @@ def test_cancel_visit_view_with_loging_in(client, set_up):
     after_cancel_visit_counter = Visit.objects.count()
     assert before_cancel_visit_counter - after_cancel_visit_counter == 1
 
+    client.logout()
+    assert post_response.status_code == 302
+
 
 @pytest.mark.django_db
 def test_user_visits_view(client, set_up):
+    """Tests if only doctors and patients have permission to see their visits and the display of visits is valid."""
+    patient = Patient.objects.first()
+    doctor = Doctor.objects.first()
+
+    response = client.get(f'/yourvisits/')
+    assert response.status_code == 302
+    assert response.url == f'/login/?next=/yourvisits/'
+
+    user = patient.user
+    client.force_login(user=user)
+    response = client.get(f'/yourvisits/')
+    assert response.status_code == 200
+    assert response.context.get('visit_list').count() == 1
+
+    client.logout()
+
+    response = client.get(f'/yourvisits/')
+    assert response.status_code == 302
+    assert response.url == f'/login/?next=/yourvisits/'
+
+    user = doctor.user
+    client.force_login(user=user)
+    response = client.get(f'/yourvisits/')
+    assert response.status_code == 200
+    assert response.context.get('visit_list').count() == 1
+
+
+@pytest.mark.django_db
+def test_user_visit_view(client, set_up):
+    """Tests if only doctors and patients have permission to see their visit and the display of visit is valid."""
     patient = Patient.objects.first()
     doctor = Doctor.objects.first()
     visit = patient.visit_set.first()
@@ -130,6 +164,7 @@ def test_user_visits_view(client, set_up):
 
 @pytest.mark.django_db
 def test_cancel_term_view(client, set_up):
+    """Tests if only doctors have permission to cancel term and if term was canceled correctly."""
     before_cancel_term_counter = Term.objects.count()
 
     doctor = Doctor.objects.first()
@@ -194,6 +229,7 @@ def test_logout_view(client, set_up):
 
 @pytest.mark.django_db
 def test_register_visit_view(client, set_up):
+    """Tests if visit through view with form was added correctly."""
     term = Term.objects.first()
     patient = Patient.objects.first()
     doctor = Doctor.objects.first()
@@ -254,6 +290,7 @@ def test_signup_view(client, set_up):
 
 @pytest.mark.django_db
 def test_add_term_view(client, set_up):
+    """Tests if term through view with form was added correctly."""
     term_count_before_create = Term.objects.count()
     patient = Patient.objects.first()
     doctor = Doctor.objects.first()
@@ -283,6 +320,7 @@ def test_add_term_view(client, set_up):
 
 @pytest.mark.django_db
 def test_add_multiple_term_view(client, set_up):
+    """It's variation of test_add_term_view. It tests if multiple term was added."""
     term_count_before_create = Term.objects.count()
     patient = Patient.objects.first()
     doctor = Doctor.objects.first()

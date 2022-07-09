@@ -23,6 +23,7 @@ from .forms import RegisterFormUser, RegisterFormPatient, TermAddForm, MultipleT
 
 class LandingPage(View):
     """Main page of web_app with access through navbar to other views."""
+
     def get(self, request):
         return render(request, 'index.html')
 
@@ -150,6 +151,7 @@ class VisitAdd(UserPassesTestMixin, View):
 
 class SignUpView(UserPassesTestMixin, View):
     """View allows to create patient account (Patient object and related with it User object)."""
+
     def test_func(self):
         return not self.request.user.is_authenticated
 
@@ -190,9 +192,9 @@ class SignUpView(UserPassesTestMixin, View):
                 user.save()
 
                 Patient.objects.create(
-                                user=user, pesel=pesel,
-                                identification_type=identification_type,
-                                phone_number=phone_number
+                    user=user, pesel=pesel,
+                    identification_type=identification_type,
+                    phone_number=phone_number
                 )
 
                 messages.success(request, "Thank you for joining. Now you can log in.")
@@ -206,6 +208,7 @@ class EditUserView(UserPassesTestMixin, View):
     View allows patients to edit their details excluding password. Editng doctors their details by themselves
     is forbiden and must be done in Django Admin.
     """
+
     def test_func(self):
         user = self.request.user
         return getattr(user, 'patient', False)
@@ -396,7 +399,7 @@ class MultipleTermAdd(UserPassesTestMixin, View):
             day_hour_from = datetime.datetime.combine(date.today(), hour_from)
             minutes = (day_hour_to - day_hour_from).total_seconds() / 60.0
 
-            for _ in range(int(minutes/visit_time)):
+            for _ in range(int(minutes / visit_time)):
                 final_time = day_hour_from + datetime.timedelta(minutes=visit_time)
                 Term.objects.create(
                     date=date, hour_from=day_hour_from.time(), hour_to=final_time.time(), office=office, doctor=doctor

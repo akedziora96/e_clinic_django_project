@@ -7,7 +7,20 @@ from e_clinic_app.models import Term, Office
 fake = Faker("pl_PL")
 
 
+def fake_phone_number():
+    return fake.phone_number().replace(' ', '')
+
+
 def fake_term(doctor, multiple=False):
+
+    """
+    Creates valid dataset needed to create object term and pass form validation
+    :param doctor: Doctor object.
+    :param multiple: True when we want to add multiple terms, False if we want to add just single term.
+    :return: If multiple = True it returns just dictionary with Term atributes values.
+    If multiple=True it returns tuple with mentioned dictionary, cumuled term's length in minutes and visit length.
+    """
+
     while True:
         hour_from = fake.time()
         hour_to = fake.time()
@@ -43,3 +56,6 @@ def fake_term(doctor, multiple=False):
 
     return fake_term_data
 
+
+if __name__ == '__main__':
+    print(fake_phone_number())
