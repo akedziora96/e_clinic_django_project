@@ -10,11 +10,6 @@ from e_clinic_app.tests.utilities import fake_term
 fake = Faker("pl_PL")
 
 
-@pytest.mark.repeat(5)
-def test_repeat_decorator():
-    pass
-
-
 @pytest.mark.django_db
 def test_user_num(client, set_up):
     num_of_specializations = Specialization.objects.all().count()
